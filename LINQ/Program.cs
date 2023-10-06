@@ -19,13 +19,33 @@ namespace LINQ
                 return false;
             }
         }
+
+        static bool predicateDelegate(Customer customer)
+        {
+            if(customer.birthDay.Year > 1990)
+                return true;
+            return false;
+        }
         static void Main(string[] args)
         {
 
             DataSource ds = new DataSource();
             List<Customer> customerList = ds.customerList();
 
-            #region LINQ sorgularında Delegate kullanımı
+            #region LINQ Sorgularında PredicateDelegate Kullanımı
+
+            // En uzun yoldan yaptık. Burada metodu dışarıda oluşturduk ve nesne örneği aldığımız predicate delegate'e bu metodu parametre olarak verdik. 
+            // Bu delegate'in bize sağladıklarını predicate değişkenine atıyoruz ve bunu FindAll metoduna atıyoruz ve istediklerimiz alıyoruz.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            Predicate<Customer> predicate = new Predicate<Customer>(predicateDelegate);
+            var usingPredicateDelegate1 = customerList.FindAll(predicate);
+            
+            // 
+            var usingPredicateDelegate2 = customerList.FindAll(new Predicate<Customer>(predicateDelegate)); 
+            
+            
+            #endregion
+
+            #region LINQ Sorgularında FuncDelegate kullanımı
 
             // => operatörü ile kısa yazımı
             var usingLambda = customerList.Where(i => i.name.StartsWith("A"));
