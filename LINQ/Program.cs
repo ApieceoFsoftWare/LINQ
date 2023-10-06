@@ -7,12 +7,53 @@ using System.Threading.Tasks;
 namespace LINQ
 {
     internal class Program
-    {
+    {   
+        static bool usingFuncDelegate(Customer c)
+        {
+            if (c.name[0]== 'A')
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         static void Main(string[] args)
         {
 
             DataSource ds = new DataSource();
             List<Customer> customerList = ds.customerList();
+
+            #region LINQ sorgularında Delegate kullanımı
+
+            // => operatörü ile kısa yazımı
+            var usingLambda = customerList.Where(i => i.name.StartsWith("A"));
+
+            // => operatörü olmadan yazımı
+            Func<Customer, bool> usingFuncDelegate1= new Func<Customer, bool>(usingFuncDelegate);                           
+            var usingFuncDelegate2 = customerList.Where(usingFuncDelegate);                                                 
+
+            // En uzun kullanımıdır. Burada Where içine yeni bir func delegate örnekleyip alması gereken parametreleri verip bir de içine fonksiyon veriyoruz.
+            var usingFuncDelegate3 = customerList.Where(new Func<Customer, bool>(usingFuncDelegate));                       
+
+            // Üsttekinden daha kısa kullanımıdır. Yukarıda Func Delegate örnekledik. Func Delegate delegate'ti extend ettiği için aldığı parametre ile
+            // istediğimiz sorguyu return edersek aslında üstteki ile aynı işi yapmış oluruz.
+            var usingFuncDelegate4 = customerList.Where(delegate (Customer c) { return c.name[0] == 'A' ? true : false; }); 
+
+            // Üsttekinden farkı Where içine delegate olduğunu belirmemize gerek yok çünkü program içindekinin delegate olduğunu biliyor.
+            var usingFuncDelegate5 = customerList.Where((Customer c) => { return c.name[0] == 'A' ? true : false; });
+
+            // Bir değişken üzerinden lambda operatörü ile istediğimiz bilgiyi sorgu ile return ediyoruz. Lambda burada işlemi kısaltan kodları içeriyor.
+            var usingFuncDelegate6 = customerList.Where((m) => { return m.name[0] == 'A' ? true : false; });
+
+            // Yukarıdakinden ve hepsinden daha kısa olan kod tanımı... Burada değişkeni parantez içine almamıza gerek yok ve return dememize de gerek yok.
+            // Program bunu kendisi lambda operatörü sayesinde algılıyor. Yukarıdaki kodlar alttaki kodun kısalmasındaki sürecin nasıl olduğunu gösteren
+            // süreçtir.
+            var usingFuncDelegate7 = customerList.Where(m => m.name[0] == 'A'); // Bu kadar kısaldı 
+
+
+            #endregion
 
             #region Examples
             // 1: Müşteriler içerisinde ülke değeri A ile başlayan müşterileri LINQ to Metode kullanarak yapalım...
@@ -40,10 +81,11 @@ namespace LINQ
             var customerListExample4 = from customer in customerList
                                        where customer.birthDay.Year > 1990 || customer.name.Contains("a")
                                        select customer;
+
                                        
             #endregion
 
-                                       #region LINQ Query Types
+            #region LINQ Query Types
             // 1.Yol Genelde bu yol tercih edilir!
             int result1 = customerList.Where(I => I.name.StartsWith("A")).Count();
 
